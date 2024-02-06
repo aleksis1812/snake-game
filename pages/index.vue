@@ -55,7 +55,6 @@ onMounted(() => {
         break;
       }
     }
-    move();
   });
 
   setInterval(move, 500);
@@ -67,9 +66,11 @@ function move() {
     y: snake.value[0].y + direction.value.y,
   };
 
+  if (newHead.x == food.value.x && newHead.y == food.value.y)
+    snake.value.push({});
+
   snake.value = snake.value.map((part, index) => {
     if (index == 0) return newHead;
-
     return snake.value[index - 1];
   });
 }
