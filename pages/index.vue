@@ -19,12 +19,10 @@
           background:
             snake.filter((part) => part.x == row && part.y == col).length ||
             (food.x == row && food.y == col)
-              ? 'green'
+              ? color
               : 'black',
         }"
-      >
-        {{ row }} {{ col }}
-      </div>
+      ></div>
     </div>
   </div>
 </template>
@@ -35,6 +33,7 @@ const columns = ref(45);
 const snake = ref([{ x: 10, y: 20 }]);
 const food = ref({});
 const direction = ref({ x: 0, y: 0 });
+const color = ref("green");
 
 onMounted(() => {
   addFood();
@@ -64,12 +63,20 @@ onMounted(() => {
 });
 
 function move() {
+  if (direction.value.x == 0 && direction.value.y == 0) return;
+
   let newHead = {
     x: snake.value[0].x + direction.value.x,
     y: snake.value[0].y + direction.value.y,
   };
 
   if (newHead.x == food.value.x && newHead.y == food.value.y) eat();
+
+  if (
+    snake.value.filter((part) => part.x == newHead.x && part.y == newHead.y)
+      .length > 0
+  )
+    die();
 
   snake.value = snake.value.map((part, index) => {
     if (index == 0) return newHead;
@@ -93,7 +100,11 @@ function addFood() {
     snake.value.filter((part) => part.x == x && part.y == y).length != 0
   );
 
-  console.log(x, y);
   food.value = { x, y };
+}
+
+function die() {
+  direction.value = { x: 0, y: 0 };
+  color.value = "red";
 }
 </script>
