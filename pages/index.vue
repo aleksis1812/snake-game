@@ -22,7 +22,9 @@
               ? 'green'
               : 'black',
         }"
-      ></div>
+      >
+        {{ row }} {{ col }}
+      </div>
     </div>
   </div>
 </template>
@@ -31,12 +33,13 @@
 const rows = ref(20);
 const columns = ref(45);
 const snake = ref([{ x: 10, y: 20 }]);
-const food = ref({ x: 5, y: 6 });
+const food = ref({});
 const direction = ref({ x: 0, y: 0 });
 
 onMounted(() => {
+  addFood();
+
   window.addEventListener("keyup", function (ev) {
-    console.log(ev.key);
     switch (ev.key) {
       case "ArrowUp": {
         direction.value = { x: -1, y: 0 };
@@ -57,7 +60,7 @@ onMounted(() => {
     }
   });
 
-  setInterval(move, 500);
+  setInterval(move, 200);
 });
 
 function move() {
@@ -66,12 +69,31 @@ function move() {
     y: snake.value[0].y + direction.value.y,
   };
 
-  if (newHead.x == food.value.x && newHead.y == food.value.y)
-    snake.value.push({});
+  if (newHead.x == food.value.x && newHead.y == food.value.y) eat();
 
   snake.value = snake.value.map((part, index) => {
     if (index == 0) return newHead;
     return snake.value[index - 1];
   });
+}
+
+function eat() {
+  snake.value.push({});
+  addFood();
+}
+
+function addFood() {
+  let x = 0;
+  let y = 0;
+
+  do {
+    x = Math.floor(Math.random() * (rows.value - 1)) + 1;
+    y = Math.floor(Math.random() * (columns.value - 1)) + 1;
+  } while (
+    snake.value.filter((part) => part.x == x && part.y == y).length != 0
+  );
+
+  console.log(x, y);
+  food.value = { x, y };
 }
 </script>
