@@ -17,8 +17,8 @@
         style="display: table-cell; border: 1px solid green"
         :style="{
           background:
-            snake.filter((part) => part.x == row && part.y == col).length ||
-            (food.x == row && food.y == col)
+            snake.filter((part) => part.x == col && part.y == row).length ||
+            (food.y == row && food.x == col)
               ? color
               : 'black',
         }"
@@ -30,7 +30,7 @@
 <script setup>
 const rows = ref(20);
 const columns = ref(45);
-const snake = ref([{ x: 10, y: 20 }]);
+const snake = ref([{ x: 20, y: 10 }]);
 const food = ref({});
 const direction = ref({ x: 0, y: 0 });
 const color = ref("green");
@@ -41,19 +41,19 @@ onMounted(() => {
   window.addEventListener("keyup", function (ev) {
     switch (ev.key) {
       case "ArrowUp": {
-        direction.value = { x: -1, y: 0 };
+        direction.value = { x: 0, y: -1 };
         break;
       }
       case "ArrowDown": {
-        direction.value = { x: 1, y: 0 };
-        break;
-      }
-      case "ArrowRight": {
         direction.value = { x: 0, y: 1 };
         break;
       }
+      case "ArrowRight": {
+        direction.value = { x: 1, y: 0 };
+        break;
+      }
       case "ArrowLeft": {
-        direction.value = { x: 0, y: -1 };
+        direction.value = { x: -1, y: 0 };
         break;
       }
     }
@@ -65,9 +65,17 @@ onMounted(() => {
 function move() {
   if (direction.value.x == 0 && direction.value.y == 0) return;
 
+  let newX = snake.value[0].x + direction.value.x;
+  let newY = snake.value[0].y + direction.value.y;
+
+  if (newX > columns.value) newX = 1;
+  if (newX < 1) newX = columns.value;
+  if (newY > rows.value) newY = 1;
+  if (newY < 1) newY = rows.value;
+
   let newHead = {
-    x: snake.value[0].x + direction.value.x,
-    y: snake.value[0].y + direction.value.y,
+    x: newX,
+    y: newY,
   };
 
   if (newHead.x == food.value.x && newHead.y == food.value.y) eat();
@@ -94,8 +102,8 @@ function addFood() {
   let y = 0;
 
   do {
-    x = Math.floor(Math.random() * (rows.value - 1)) + 1;
-    y = Math.floor(Math.random() * (columns.value - 1)) + 1;
+    x = Math.floor(Math.random() * (columns.value - 1)) + 1;
+    y = Math.floor(Math.random() * (rows.value - 1)) + 1;
   } while (
     snake.value.filter((part) => part.x == x && part.y == y).length != 0
   );
