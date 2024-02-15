@@ -34,6 +34,8 @@ const snake = ref([{ x: 20, y: 10 }]);
 const food = ref({});
 const direction = ref({ x: 0, y: 0 });
 const color = ref("green");
+const speed = ref(200);
+var interval = "";
 
 onMounted(() => {
   addFood();
@@ -59,7 +61,7 @@ onMounted(() => {
     }
   });
 
-  setInterval(move, 200);
+  interval = setInterval(move, speed.value);
 });
 
 function move() {
@@ -95,6 +97,9 @@ function move() {
 function eat() {
   snake.value.push({});
   addFood();
+  if (speed.value > 20) speed.value -= 10;
+  clearInterval(interval);
+  interval = setInterval(move, speed.value);
 }
 
 function addFood() {
