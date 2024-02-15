@@ -16,13 +16,23 @@
         v-for="col in columns"
         style="display: table-cell; border: 1px solid green"
         :style="{
-          background:
-            snake.filter((part) => part.x == col && part.y == row).length ||
-            (food.y == row && food.x == col)
-              ? color
-              : 'black',
+          background: snake.filter((part) => part.x == col && part.y == row)
+            .length
+            ? snakeColor
+            : food.y == row && food.x == col
+            ? foodColor
+            : 'black',
         }"
       ></div>
+    </div>
+    <div v-if="end" class="game-over">
+      <p style="text-align: center; font-size: 60px">
+        GAME OVER
+        <br />
+        <span style="text-align: center; font-size: 40px">
+          Your score: {{ score }} points
+        </span>
+      </p>
     </div>
   </div>
 </template>
@@ -33,8 +43,11 @@ const columns = ref(45);
 const snake = ref([{ x: 20, y: 10 }]);
 const food = ref({});
 const direction = ref({ x: 0, y: 0 });
-const color = ref("green");
+const snakeColor = ref("green");
+const foodColor = ref("orange");
 const speed = ref(200);
+const score = ref(0);
+const end = ref(false);
 var interval = "";
 
 onMounted(() => {
@@ -97,6 +110,8 @@ function move() {
 function eat() {
   snake.value.push({});
   addFood();
+  score.value += 10;
+
   if (speed.value > 20) speed.value -= 10;
   clearInterval(interval);
   interval = setInterval(move, speed.value);
@@ -118,6 +133,24 @@ function addFood() {
 
 function die() {
   direction.value = { x: 0, y: 0 };
-  color.value = "red";
+  snakeColor.value = "red";
+  setTimeout(() => {
+    end.value = true;
+  }, 1500);
 }
 </script>
+
+<style scoped>
+.game-over {
+  position: absolute;
+  top: 30%;
+  left: 30%;
+  color: black;
+  text-align: center;
+  z-index: 1000;
+  width: 40%;
+  height: 30%;
+  border: 1px solid red;
+  background-color: #dc0000ca;
+}
+</style>
